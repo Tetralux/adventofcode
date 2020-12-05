@@ -12,15 +12,17 @@ main :: proc() {
 
     lines := strings.split(string(input), "\n");
 
-    max_id: int;
+    m: map[int]int;
+    for id in 0..926 {
+        m[id] = id;
+    }
 
     for line in lines {
         seat := parse_seat(line);
-
-        if seat.id > max_id { max_id = seat.id; }
+        delete_key(&m, seat.id);
     }
 
-    println(max_id);
+    println(m);
 }
 
 Seat :: struct {
