@@ -16,19 +16,111 @@ main :: proc() {
     num_valid: int;
 
     for pp in passports {
-        if pp.byr == "" { continue; }
-        if pp.iyr == "" { continue; }
-        if pp.eyr == "" { continue; }
-        if pp.hgt == "" { continue; }
-        if pp.hcl == "" { continue; }
-        if pp.ecl == "" { continue; }
-        if pp.pid == "" { continue; }
-        // if pp.cid == "" { continue; }
+        if validate_passport(pp) {
+            num_valid += 1;
+        }
 
-        num_valid += 1;
     }
 
     println(num_valid);
+}
+
+validate_passport :: proc(pp: Passport) -> bool {
+    {
+        if len(pp.byr) != 4 { return false; }
+
+        val, ok := strconv.parse_int(pp.byr, 10);
+        if !ok { return false; }
+
+        switch val {
+        case 1920..2002: // okay
+        case:            return false;
+        }
+    }
+
+    {
+        if len(pp.iyr) != 4 { return false; }
+
+        val, ok := strconv.parse_int(pp.iyr, 10);
+        if !ok { return false; }
+
+        switch val {
+        case 2010..2020: // okay
+        case:            return false;
+        }
+    }
+
+    {
+        if len(pp.eyr) != 4 { return false; }
+
+        val, ok := strconv.parse_int(pp.eyr, 10);
+        if !ok { return false; }
+
+        switch val {
+        case 2020..2030: // okay
+        case:            return false;
+        }
+    }
+
+    {
+        i := 0;
+        loop: for ; i < len(pp.hgt); i += 1 {
+            switch pp.hgt[i] {
+            case '0'..'9':
+                // okay
+            case:
+                break loop;
+            }
+        }
+
+        val, ok := strconv.parse_int(pp.hgt[:i], 10);
+        if !ok { return false; }
+
+        units := pp.hgt[i:];
+        switch units {
+        case "cm":
+            switch val {
+            case 150..193: // okay
+            case:          return false;
+            }
+        case "in":
+            switch val {
+            case 59..76: // okay
+            case:        return false;
+            }
+        case:
+            return false;
+        }
+    }
+
+    if len(pp.hcl) == 0 { return false; }
+    if pp.hcl[0] != '#' { return false; }
+    {
+        n := 0;
+        loop2: for r in pp.hcl[1:] {
+            switch r {
+            case '0'..'9', 'a'..'f': n += 1;
+            case:                    break loop2;
+            }
+        }
+        if n != 6 { return false; }
+
+        val, ok := strconv.parse_int(pp.hcl[1:], 16);
+        if !ok { return false; }
+    }
+
+    switch pp.ecl {
+    case "amb", "blu", "brn", "gry", "grn", "hzl", "oth":
+        // okay
+    case:
+        return false;
+    }
+
+    if len(pp.pid) != 9 { return false; }
+
+    // NOTE: ignore cid
+
+    return true;
 }
 
 Passport :: struct {
