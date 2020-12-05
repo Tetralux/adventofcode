@@ -41,22 +41,44 @@ main :: proc() {
 
 
 
-    pos := Pos{0, 0};
-    trees_encountered := 0;
+    Slope :: Pos;
 
-    for {
-        move(lines, &pos, 3, 1);
-        if !in_table(lines, pos) {
-            break;
+    slopes := []Slope {
+        {1, 1},
+        {3, 1},
+        {5, 1},
+        {7, 1},
+        {1, 2},
+    };
+
+
+    tree_counts: [dynamic]int;
+
+    for slope in slopes {
+        pos := Pos{0, 0};
+        trees_encountered := 0;
+
+        for {
+            move(lines, &pos, slope.across, slope.down);
+            if !in_table(lines, pos) {
+                break;
+            }
+
+            tile := get_at(lines, pos);
+            if tile == '#' {
+                trees_encountered += 1;
+            }
         }
 
-        tile := get_at(lines, pos);
-        if tile == '#' {
-            trees_encountered += 1;
-        }
+        append(&tree_counts, trees_encountered);
     }
 
-    println(trees_encountered);
+    product := 1;
+    for count in tree_counts {
+        product *= count;
+    }
+
+    println(product);
 }
 
 
