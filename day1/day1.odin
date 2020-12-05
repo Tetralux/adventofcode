@@ -13,16 +13,32 @@ main :: proc() {
 
     data := lines_to_data(string(input));
 
-    for a in data {
+    //
+    // Part 1
+    //
+    outer1: for a in data {
         for b in data {
             if a+b == 2020 {
-                println(a, b, a*b);
-                os.exit(0);
+                println(a, b, "=>", a*b);
+                break outer1;
             }
         }
     }
 
-    os.exit(1);
+
+    //
+    // Part 2
+    //
+    outer2: for a in data {
+        for b in data {
+            for c in data {
+                if a+b+c == 2020 {
+                    println(a, b, c, "=>", a*b*c);
+                    break outer2;
+                }
+            }
+        }
+    }
 }
 
 
