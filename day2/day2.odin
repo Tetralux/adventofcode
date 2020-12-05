@@ -1,6 +1,7 @@
 package day2
 
 import "core:strings"
+import "core:unicode/utf8"
 import "core:strconv"
 import "core:os"
 import "core:fmt"
@@ -47,15 +48,20 @@ lines_to_data :: proc(s: string) -> []Entry {
 }
 
 validate_entry :: proc(d: Entry) -> bool {
-    count: int;
+    positions := [2]int{d.min, d.max}; // NOTE(tetra): Not min/max anymore, but we don't need to maintain this program. Rename them if we did.
+    positions_valid: int;
 
-    for r in d.password {
+    for p in positions {
+        index := p - 1;
+        assert(index >= 0 && index <= len(d.password)-1);
+
+        r := utf8.rune_at_pos(d.password, index);
         if r == d.target_letter {
-            count += 1;
+            positions_valid += 1;
         }
     }
 
-    return count >= d.min && count <= d.max;
+    return positions_valid == 1;
 }
 
 parse_line :: proc(line: string) -> (result: Entry) {
