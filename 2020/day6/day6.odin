@@ -13,21 +13,56 @@ main :: proc() {
     BLANK_LINE :: "\n\n";
     group_data := strings.split(string(input), BLANK_LINE);
 
-    sum := 0;
 
-    for g in group_data {
-        people := strings.split(g, "\n", context.temp_allocator);
 
-        m := make(map[rune]bool, 26, context.temp_allocator);
+    //
+    // Part 1
+    //
+    {
+        sum := 0;
 
-        for person in people {
-            for question in person {
-                m[question] = true;
+        for g in group_data {
+            people := strings.split(g, "\n", context.temp_allocator);
+
+            m := make(map[rune]bool, 26, context.temp_allocator);
+
+            for person in people {
+                for question in person {
+                    m[question] = true;
+                }
+            }
+
+            sum += len(m);
+        }
+
+        println(sum);
+    }
+
+
+    //
+    // Part 2
+    //
+    {
+        sum := 0;
+
+        for g in group_data {
+            people := strings.split(g, "\n", context.temp_allocator);
+
+            m := make(map[rune]int, 26, context.temp_allocator);
+
+            for person in people {
+                for question in person {
+                    m[question] += 1;
+                }
+            }
+
+            for _, count in m {
+                if count == len(people) {
+                    sum += 1;
+                }
             }
         }
 
-        sum += len(m);
+        println(sum);
     }
-
-    println(sum);
 }
